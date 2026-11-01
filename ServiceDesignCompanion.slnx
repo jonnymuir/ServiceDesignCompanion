@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ServiceDesignCompanion.Site/ServiceDesignCompanion.Site.csproj" />
+  </Folder>
+</Solution>
