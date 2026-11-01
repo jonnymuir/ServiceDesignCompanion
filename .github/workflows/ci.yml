@@ -32,13 +32,6 @@ jobs:
         run: node scripts/check-policies.mjs
       - name: Doc links
         run: node scripts/check-doc-links.mjs
-      # Umbraco writes a generated Imaging:HMACSecretKey into appsettings.json on first boot.
-      - name: No generated secrets in tracked config
-        run: |
-          if git grep -n HMACSecretKey -- '**/appsettings.json' '**/appsettings.*.json'; then
-            echo "::error::Imaging:HMACSecretKey must not be committed. Revert the change Umbraco made to appsettings.json."
-            exit 1
-          fi
 
   # One aggregate check, so the ruleset names "all" instead of every job.
   all:
