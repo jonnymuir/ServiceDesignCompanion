@@ -26,9 +26,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
-    <RazorCompileOnBuild>false</RazorCompileOnBuild>
-    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <!-- Views are compiled at build time; runtime compilation keeps the Roslyn compiler resident
+         and costs several hundred MB on a small VPS. -->
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <RazorCompileOnPublish>true</RazorCompileOnPublish>
   </PropertyGroup>
 
 </Project>

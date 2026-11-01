@@ -1,6 +1,13 @@
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Umbraco writes a generated imaging key into appsettings.json when none is configured, which
+// would put a secret in source control. Supply one for this process instead; production sets its own.
+if (string.IsNullOrEmpty(builder.Configuration["Umbraco:CMS:Imaging:HMACSecretKey"]))
+{
+    builder.Configuration["Umbraco:CMS:Imaging:HMACSecretKey"] = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
+}
+
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
