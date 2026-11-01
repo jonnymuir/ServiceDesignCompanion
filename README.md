@@ -27,6 +27,7 @@ Contains public sector information licensed under the
 
 ```bash
 dotnet build ServiceDesignCompanion.slnx
+mkdir -p src/ServiceDesignCompanion.Site/umbraco/Data
 dotnet run --project src/ServiceDesignCompanion.Site
 ```
 
