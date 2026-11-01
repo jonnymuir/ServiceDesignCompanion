@@ -8,6 +8,12 @@ if (string.IsNullOrEmpty(builder.Configuration["Umbraco:CMS:Imaging:HMACSecretKe
     builder.Configuration["Umbraco:CMS:Imaging:HMACSecretKey"] = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
 }
 
+// In production the site listens on loopback behind Cloudflare Tunnel, which terminates HTTPS.
+// Loopback is a known proxy by default, so only the tunnel's forwarded headers are trusted.
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+        | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto);
+
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
@@ -16,9 +22,9 @@ builder.CreateUmbracoBuilder()
 
 WebApplication app = builder.Build();
 
+app.UseForwardedHeaders();
 
 await app.BootUmbracoAsync();
-
 
 app.UseUmbraco()
     .WithMiddleware(u =>
