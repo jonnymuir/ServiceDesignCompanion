@@ -1,0 +1,25 @@
+﻿@inherits UmbracoViewPage
+@{
+    Layout = "Shared/Master.cshtml";
+}
+<h1 class="govuk-heading-xl">@Model.Name</h1>
+<p class="govuk-body-l">@Model.Value(SiteContentTypes.Intro)</p>
+
+<ol class="psd-points">
+    @foreach (var point in Model.Children())
+    {
+        var summary = point.Value<string>(SiteContentTypes.Summary);
+        <li class="psd-points__item">
+            <span class="psd-points__number" aria-hidden="true">@(point.Value<int>(SiteContentTypes.PointNumber))</span>
+            <div class="psd-points__body">
+                <a class="govuk-link psd-points__title" href="@point.Url()">@point.Name</a>
+                @if (!string.IsNullOrWhiteSpace(summary))
+                {
+                    <p class="govuk-body-s psd-points__summary">@summary</p>
+                }
+            </div>
+        </li>
+    }
+</ol>
+
+<p class="govuk-body-s">Read the Service Standard itself on <a class="govuk-link" href="@ServiceStandard.SourceUrl">GOV.UK</a>.</p>

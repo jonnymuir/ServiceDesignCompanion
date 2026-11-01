@@ -1,0 +1,107 @@
+/* Pocket Service Design brand: Signpost teal. Colours are set once as Prism tokens; Prism's
+   GOV.UK bridge carries them onto GOV.UK Frontend's --govuk-* properties. The few GOV.UK
+   properties the bridge does not alias are set directly. */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --prism-primary: #0b6e69;
+  --prism-primary-contrast: #ffffff;
+  --prism-link: #0b6e69;
+  --prism-text: #1b2626;
+  --prism-muted: #4d5e5c;
+  --prism-surface: #ffffff;
+  --prism-surface-alt: #f4f8f7;
+  --prism-border: #b9cbc8;
+  --prism-focus: #ffc94a;
+
+  --govuk-template-background-colour: #f4f8f7;
+  --govuk-surface-background-colour: #f4f8f7;
+  --govuk-link-hover-colour: #064541;
+  --govuk-link-visited-colour: #0b6e69;
+  --govuk-font-family: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --psd-header: #0b6e69;
+  --psd-header-text: #ffffff;
+  --psd-tile: #ffffff;
+  --psd-line: #d3e0de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --prism-primary: #4fc2b8;
+    --prism-primary-contrast: #0b1f1d;
+    --prism-link: #6fd3ca;
+    --prism-text: #e6efed;
+    --prism-muted: #9db3b0;
+    --prism-surface: #0f1716;
+    --prism-surface-alt: #172221;
+    --prism-border: #3a5250;
+
+    --govuk-template-background-colour: #0f1716;
+    --govuk-surface-background-colour: #172221;
+    --govuk-link-hover-colour: #a6e8e1;
+    --govuk-link-visited-colour: #6fd3ca;
+
+    --psd-header: #172221;
+    --psd-header-text: #e6efed;
+    --psd-tile: #172221;
+    --psd-line: #26393a;
+    color-scheme: dark;
+  }
+}
+
+body,
+.govuk-template__body {
+  font-family: var(--govuk-font-family);
+  background: var(--govuk-template-background-colour);
+  color: var(--prism-text);
+}
+
+/* GOV.UK Frontend sets its own font stack on most components; follow the brand typeface. */
+.govuk-body, .govuk-body-l, .govuk-body-s, .govuk-list, .govuk-link, .govuk-caption-l,
+.govuk-heading-xl, .govuk-heading-m, .govuk-pagination, .govuk-skip-link {
+  font-family: var(--govuk-font-family);
+  color: inherit;
+}
+
+.govuk-caption-l { color: var(--prism-muted); }
+
+.psd-header { background: var(--psd-header); color: var(--psd-header-text); border-bottom: 4px solid var(--prism-primary); }
+.psd-header__inner { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; justify-content: space-between; padding-block: 14px; }
+.psd-header__name, .psd-header__link { color: var(--psd-header-text); text-decoration: none; font-weight: 700; }
+.psd-header__name { font-size: 1.25rem; }
+.psd-header__link:hover, .psd-header__name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.psd-header a:focus { outline: 3px solid transparent; background: var(--prism-focus); color: #1b1a12; box-shadow: 0 4px 0 #1b1a12; }
+
+.psd-tile { display: grid; gap: 4px; max-width: 34rem; padding: 20px; background: var(--psd-tile); border: 1px solid var(--psd-line); border-radius: 8px; color: inherit; text-decoration: none; }
+.psd-tile__title { font-size: 1.375rem; font-weight: 700; color: var(--prism-link); text-decoration: underline; text-underline-offset: 3px; }
+.psd-tile__text { color: var(--prism-muted); }
+.psd-tile:focus { outline: 3px solid transparent; background: var(--prism-focus); box-shadow: 0 4px 0 #1b1a12; }
+.psd-tile:focus .psd-tile__title, .psd-tile:focus .psd-tile__text { color: #1b1a12; }
+
+.psd-points { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 12px; max-width: 46rem; }
+.psd-points__item { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: var(--psd-tile); border: 1px solid var(--psd-line); border-radius: 8px; }
+.psd-points__number { font-weight: 700; font-size: 1.25rem; color: var(--prism-primary); font-variant-numeric: tabular-nums; }
+.psd-points__title { font-weight: 700; font-size: 1.1875rem; }
+.psd-points__summary { margin: 4px 0 0; color: var(--prism-muted); }
+
+.psd-prose { max-width: 40rem; }
+.psd-questions { max-width: 40rem; margin-block: 30px; padding: 16px 20px 4px; background: var(--psd-tile); border-left: 6px solid var(--prism-primary); border-radius: 0 8px 8px 0; }
+
+.psd-footer { margin-top: 40px; padding-block: 24px; border-top: 1px solid var(--psd-line); color: var(--prism-muted); }
+.psd-footer .govuk-body-s { max-width: 46rem; }

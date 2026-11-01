@@ -14,10 +14,27 @@ A free mobile app (iOS and Android) and companion website with three parts:
    it, the phase it suits and the related Standard point. Filterable by phase and by point.
    Favourites are kept on the device only.
 
+## Name and brand
+
+| | |
+|---|---|
+| App Store name | Pocket Service Design |
+| App Store subtitle | Your service design companion |
+| Home-screen label | Pocket SD |
+| Brand colour | Signpost teal `#0B6E69` (dark mode `#4FC2B8`) |
+| Text and background | Ink `#1B2626` on `#F4F8F7` |
+| Focus | Warm yellow `#FFC94A` with a dark underline |
+| Typeface | Atkinson Hyperlegible Next, served from the site itself |
+
+Brand colours are set once as Prism `--prism-*` tokens; Prism's bridge carries them onto GOV.UK
+Frontend's `--govuk-*` properties. Every pairing meets WCAG AA, body text AAA. Phase tags use the
+same light tints with dark text in every theme, and always name the phase in text.
+
 ## Principles
 
 - **No user data on the server.** No accounts, no analytics, no tracking in version 1. Everything
-  the server holds is published content, so a lost database loses nothing.
+  the server holds is published content, so a lost database loses nothing. Fonts and scripts are
+  served from the site itself, so no third party learns who visits.
 - **All content is seeded from code.** Method cards, Standard explainers and the phase finder
   blueprint live in this repo and are seeded on every boot.
 - **No false promises.** The app helps teams prepare and reflect. It never claims to predict an

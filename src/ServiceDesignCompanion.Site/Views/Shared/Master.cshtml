@@ -1,0 +1,66 @@
+@inherits UmbracoViewPage
+@{
+    var isApp = PrismMobileRequestDetection.IsPrismMobileRequest(Context);
+    var standard = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.ServiceStandardPage);
+    var title = Model.ContentType.Alias == SiteContentTypes.Home ? "Pocket Service Design" : $"{Model.Name} - Pocket Service Design";
+}
+<!DOCTYPE html>
+<html lang="en-GB" class="govuk-template">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B6E69" />
+    <title>@title</title>
+
+    @* GOV.UK Frontend first, then Prism's design system and its GOV.UK bridge, then this site's
+       brand tokens, then any live overrides saved on the tenant. Later files win the cascade. *@
+    <link rel="stylesheet" href="/_content/Wayfinder.Rendering.GovUk/govuk-frontend/govuk-frontend.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/App_Plugins/UmbracoPrism/branding/prism-branding.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/umbraco/prism/branding.css" />
+    @if (isApp)
+    {
+        <link rel="stylesheet" href="/App_Plugins/UmbracoPrism/mobile-shell/prism-mobile-shell.css" asp-append-version="true" />
+    }
+</head>
+<body class="govuk-template__body">
+    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
+    <header class="psd-header">
+        <div class="govuk-width-container psd-header__inner">
+            <a class="psd-header__name" href="/">Pocket Service Design</a>
+            @if (standard is not null)
+            {
+                <nav aria-label="Main">
+                    <a class="psd-header__link" href="@standard.Url()">The Service Standard</a>
+                </nav>
+            }
+        </div>
+    </header>
+
+    <div class="govuk-width-container">
+        <main class="govuk-main-wrapper" id="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="psd-footer">
+        <div class="govuk-width-container">
+            <p class="govuk-body-s">Pocket Service Design is an independent app. It is not made, endorsed or approved by the Government Digital Service or any part of government, and only an assessment panel decides whether a service meets the Service Standard.</p>
+            <p class="govuk-body-s">Contains public sector information licensed under the <a class="govuk-link" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence v3.0</a>.</p>
+        </div>
+    </footer>
+
+    @if (isApp)
+    {
+        <script src="/App_Plugins/UmbracoPrism/mobile-shell/prism-mobile-shell-guard.js" asp-append-version="true"></script>
+    }
+    @if (PrismMobileRequestDetection.HasNativeTabs(Context))
+    {
+        @* Saved pages: the app keeps copies of pages on the device so they can be read offline. *@
+        <script src="/App_Plugins/UmbracoPrism/mobile-shell/prism-offline.js" asp-append-version="true"
+                data-prism-saved-pages="@(PrismMobileRequestDetection.SavesPages(Context) ? "on" : "off")"
+                data-prism-signed-in="false"></script>
+    }
+</body>
+</html>
