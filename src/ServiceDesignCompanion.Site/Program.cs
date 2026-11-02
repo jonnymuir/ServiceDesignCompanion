@@ -39,3 +39,6 @@ app.UseUmbraco()
     });
 
 await app.RunAsync();
+
+// The booted-host tests start this exact app through WebApplicationFactory<Program>.
+public partial class Program;
