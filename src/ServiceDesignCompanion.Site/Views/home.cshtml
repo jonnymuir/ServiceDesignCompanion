@@ -2,6 +2,7 @@
 @{
     Layout = "Shared/Master.cshtml";
     var standard = Model.FirstChild(c => c.ContentType.Alias == SiteContentTypes.ServiceStandardPage);
+    var methods = Model.FirstChild(c => c.ContentType.Alias == SiteContentTypes.MethodsPage);
 }
 <h1 class="govuk-heading-xl">Pocket Service Design</h1>
 <p class="govuk-body-l">@Model.Value(SiteContentTypes.Intro)</p>
@@ -11,5 +12,13 @@
     <a class="psd-tile" href="@standard.Url()">
         <span class="psd-tile__title">The Service Standard</span>
         <span class="psd-tile__text">The 14 points in plain words, with questions to help your team reflect.</span>
+    </a>
+}
+
+@if (methods is not null)
+{
+    <a class="psd-tile" href="@methods.Url()">
+        <span class="psd-tile__title">Methods</span>
+        <span class="psd-tile__text">Service design methods, with when to use each one and how to start. Filter by phase or by point.</span>
     </a>
 }

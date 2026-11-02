@@ -39,6 +39,8 @@
   --psd-header-text: #ffffff;
   --psd-tile: #ffffff;
   --psd-line: #d3e0de;
+  --psd-button-shadow: #053a37;
+  --psd-button-hover: #095a56;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -61,6 +63,8 @@
     --psd-header-text: #e6efed;
     --psd-tile: #172221;
     --psd-line: #26393a;
+    --psd-button-shadow: #2a7d76;
+    --psd-button-hover: #6fd3ca;
     color-scheme: dark;
   }
 }
@@ -105,3 +109,29 @@ body,
 
 .psd-footer { margin-top: 40px; padding-block: 24px; border-top: 1px solid var(--psd-line); color: var(--prism-muted); }
 .psd-footer .govuk-body-s { max-width: 46rem; }
+
+/* GOV.UK Frontend hard-codes its green on buttons; follow the brand instead. */
+.govuk-button { background-color: var(--prism-primary); color: var(--prism-primary-contrast); box-shadow: 0 2px 0 var(--psd-button-shadow); font-family: var(--govuk-font-family); }
+.govuk-button:hover { background-color: var(--psd-button-hover); color: var(--prism-primary-contrast); }
+.govuk-button:focus:not(:active):not(:hover) { background-color: var(--prism-focus); color: #1b1a12; box-shadow: 0 2px 0 #1b1a12; }
+
+.psd-header__nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.psd-tile + .psd-tile { margin-top: 16px; }
+
+.psd-filter { display: flex; flex-wrap: wrap; gap: 0 20px; align-items: flex-end; max-width: 46rem; }
+.psd-filter .govuk-select { max-width: 100%; background-color: var(--prism-surface); color: var(--prism-text); border-color: var(--prism-text); }
+.psd-filter #point { width: 22rem; }
+
+.psd-methods { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 12px; max-width: 46rem; }
+.psd-methods__item { padding: 14px 16px; background: var(--psd-tile); border: 1px solid var(--psd-line); border-radius: 8px; }
+.psd-methods__title { font-weight: 700; font-size: 1.1875rem; }
+.psd-methods__summary { margin: 4px 0 8px; color: var(--prism-muted); }
+.psd-methods__item .psd-phases { margin-bottom: 0; }
+
+/* Phase tags keep the same light tints and dark text in every theme, and always name the phase. */
+.psd-phases { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.psd-phase { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 1rem; font-weight: 700; }
+.psd-phase--discovery { background: #e3eef9; color: #12324f; }
+.psd-phase--alpha { background: #f1e6f6; color: #3d1f4f; }
+.psd-phase--beta { background: #fff0d1; color: #4a3200; }
+.psd-phase--live { background: #ddf2e5; color: #123f25; }

@@ -10,6 +10,7 @@
     var index = siblings.FindIndex(p => p.Id == Model.Id);
     var previous = index > 0 ? siblings[index - 1] : null;
     var next = index >= 0 && index < siblings.Count - 1 ? siblings[index + 1] : null;
+    var methods = Model.Methods().Where(method => method.RelatedPoints().Contains(number)).ToList();
 }
 <span class="govuk-caption-l">Point @number of @siblings.Count</span>
 <h1 class="govuk-heading-xl">@Model.Name</h1>
@@ -32,6 +33,17 @@
             }
         </ul>
     </div>
+}
+
+@if (methods.Count > 0)
+{
+    <h2 class="govuk-heading-m">Methods that help</h2>
+    <ul class="govuk-list">
+        @foreach (var method in methods)
+        {
+            <li><a class="govuk-link" href="@method.Url()">@method.Name</a></li>
+        }
+    </ul>
 }
 
 <p class="govuk-body"><a class="govuk-link" href="@Model.Value(SiteContentTypes.GuidanceUrl)">Read the full guidance for point @number on GOV.UK</a></p>

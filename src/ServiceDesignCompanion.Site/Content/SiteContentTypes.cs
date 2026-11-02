@@ -6,8 +6,8 @@ using Umbraco.Cms.Core.Strings;
 namespace ServiceDesignCompanion.Site.Content;
 
 /// <summary>
-/// Creates the site's document types and templates when they are missing. The structure is
-/// Home, then The Service Standard, then one page per point.
+/// Creates the site's document types and templates when they are missing. Home holds The Service
+/// Standard, with one page per point, and Methods, with one page per method card.
 /// </summary>
 public sealed class SiteContentTypes(
     IContentTypeService contentTypeService,
@@ -18,6 +18,8 @@ public sealed class SiteContentTypes(
     public const string Home = "home";
     public const string ServiceStandardPage = "serviceStandard";
     public const string StandardPointPage = "standardPoint";
+    public const string MethodsPage = "methods";
+    public const string MethodPage = "method";
 
     public const string Intro = "intro";
     public const string PointNumber = "pointNumber";
@@ -25,6 +27,11 @@ public sealed class SiteContentTypes(
     public const string Explainer = "explainer";
     public const string Questions = "questions";
     public const string GuidanceUrl = "guidanceUrl";
+    public const string Category = "category";
+    public const string WhenToUse = "whenToUse";
+    public const string Steps = "steps";
+    public const string Phases = "phases";
+    public const string RelatedPoints = "relatedPoints";
 
     public async Task EnsureAsync()
     {
@@ -36,11 +43,22 @@ public sealed class SiteContentTypes(
             (Constants.DataTypes.Guids.TextstringGuid, GuidanceUrl, "GOV.UK guidance link"));
         var standard = await EnsureTypeAsync(ServiceStandardPage, "The Service Standard", "icon-list", allowedAsRoot: false,
             (Constants.DataTypes.Guids.TextareaGuid, Intro, "Introduction"));
+        var method = await EnsureTypeAsync(MethodPage, "Method", "icon-lightbulb", allowedAsRoot: false,
+            (Constants.DataTypes.Guids.TextstringGuid, Category, "Category"),
+            (Constants.DataTypes.Guids.TextareaGuid, Summary, "What it is for"),
+            (Constants.DataTypes.Guids.TextareaGuid, WhenToUse, "When to use it"),
+            (Constants.DataTypes.Guids.TextareaGuid, Steps, "How to do it (one step per line)"),
+            (Constants.DataTypes.Guids.TextstringGuid, Phases, "Phases (comma separated)"),
+            (Constants.DataTypes.Guids.TextstringGuid, RelatedPoints, "Service Standard points (comma separated numbers)"));
+        var methods = await EnsureTypeAsync(MethodsPage, "Methods", "icon-lightbulb", allowedAsRoot: false,
+            (Constants.DataTypes.Guids.TextareaGuid, Intro, "Introduction"));
         var home = await EnsureTypeAsync(Home, "Home", "icon-home", allowedAsRoot: true,
             (Constants.DataTypes.Guids.TextareaGuid, Intro, "Introduction"));
 
         Allow(home, standard);
         Allow(standard, point);
+        Allow(home, methods);
+        Allow(methods, method);
     }
 
     private async Task<IContentType> EnsureTypeAsync(
