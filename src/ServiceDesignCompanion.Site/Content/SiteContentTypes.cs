@@ -7,7 +7,7 @@ namespace ServiceDesignCompanion.Site.Content;
 
 /// <summary>
 /// Creates the site's document types and templates when they are missing. Home holds The Service
-/// Standard, with one page per point, and Methods, with one page per method card.
+/// Standard, with one page per point, Methods, with one page per method card, and the phase finder.
 /// </summary>
 public sealed class SiteContentTypes(
     IContentTypeService contentTypeService,
@@ -20,6 +20,7 @@ public sealed class SiteContentTypes(
     public const string StandardPointPage = "standardPoint";
     public const string MethodsPage = "methods";
     public const string MethodPage = "method";
+    public const string PhaseFinderPage = "phaseFinder";
 
     public const string Intro = "intro";
     public const string PointNumber = "pointNumber";
@@ -52,6 +53,8 @@ public sealed class SiteContentTypes(
             (Constants.DataTypes.Guids.TextstringGuid, RelatedPoints, "Service Standard points (comma separated numbers)"));
         var methods = await EnsureTypeAsync(MethodsPage, "Methods", "icon-lightbulb", allowedAsRoot: false,
             (Constants.DataTypes.Guids.TextareaGuid, Intro, "Introduction"));
+        var phaseFinder = await EnsureTypeAsync(PhaseFinderPage, "Phase finder", "icon-compass", allowedAsRoot: false,
+            (Constants.DataTypes.Guids.TextareaGuid, Intro, "Introduction"));
         var home = await EnsureTypeAsync(Home, "Home", "icon-home", allowedAsRoot: true,
             (Constants.DataTypes.Guids.TextareaGuid, Intro, "Introduction"));
 
@@ -59,6 +62,7 @@ public sealed class SiteContentTypes(
         Allow(standard, point);
         Allow(home, methods);
         Allow(methods, method);
+        Allow(home, phaseFinder);
     }
 
     private async Task<IContentType> EnsureTypeAsync(

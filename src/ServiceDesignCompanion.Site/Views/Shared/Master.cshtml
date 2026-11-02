@@ -3,6 +3,7 @@
     var isApp = PrismMobileRequestDetection.IsPrismMobileRequest(Context);
     var standard = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.ServiceStandardPage);
     var methods = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.MethodsPage);
+    var phaseFinder = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.PhaseFinderPage);
     var title = Model.ContentType.Alias == SiteContentTypes.Home ? "Pocket Service Design" : $"{Model.Name} - Pocket Service Design";
 }
 <!DOCTYPE html>
@@ -38,6 +39,10 @@
                 @if (methods is not null)
                 {
                     <a class="psd-header__link" href="@methods.Url()">Methods</a>
+                }
+                @if (phaseFinder is not null)
+                {
+                    <a class="psd-header__link" href="@phaseFinder.Url()">Phase finder</a>
                 }
             </nav>
         </div>

@@ -1,0 +1,151 @@
+definitionKey: phase-finder
+displayName: Find your likely phase
+version: 1
+description: A team answers five questions about their project and sees which phase it is probably in, what usually comes next and which points of the Service Standard to focus on. Anonymous, with no handover to anyone.
+initialStage: your-project
+requestPolicy: single
+allowManualRestart: true
+queues:
+  - key: visitor
+    displayName: Someone using the phase finder
+    actor: visitor
+calculations:
+  fields:
+    isLive:
+      expr: realUse = 'Yes, anyone can use it' and replaced = 'Yes'
+    isBeta:
+      expr: not isLive and realUse <> 'No, not yet'
+    isAlpha:
+      expr: not isLive and not isBeta and problemAgreed = 'Yes' and (evidence <> 'Not yet' or tested <> 'Not yet')
+    isDiscovery:
+      expr: not isLive and not isBeta and not isAlpha
+stages:
+  - stageKey: your-project
+    displayName: Find your likely phase
+    stageType: Question
+    queueKey: visitor
+    components:
+      - type: body
+        content: Answer five questions about your project. You will see the phase it is probably in, what teams usually do next and which points of the Service Standard to focus on.
+      - type: radio
+        fieldKey: evidence
+        label: Do you have evidence about who your users are and what they need?
+        required: true
+        options:
+          - Not yet
+          - Some, from early research
+          - Yes, from research we keep doing
+      - type: radio
+        fieldKey: problemAgreed
+        label: Has the team agreed what problem it is solving?
+        required: true
+        options:
+          - Not yet
+          - 'Yes'
+      - type: radio
+        fieldKey: tested
+        label: Have you tried out ways to solve the problem with users?
+        required: true
+        options:
+          - Not yet
+          - Yes, with prototypes
+          - Yes, with a working service
+      - type: radio
+        fieldKey: realUse
+        label: Can real users use the service to get something done?
+        required: true
+        options:
+          - No, not yet
+          - Yes, a limited group can use it
+          - Yes, anyone can use it
+      - type: radio
+        fieldKey: replaced
+        label: Has the service replaced the old ways of doing this, with a team in place to keep improving it?
+        required: true
+        options:
+          - Not yet
+          - 'Yes'
+      - type: inset-text
+        content: Your answers are not linked to you, and they are deleted within two hours.
+    routes:
+      - id: your-project--find--to-your-phase
+        target: to-your-phase
+        trigger: find
+        label: Find my likely phase
+        style: primary
+  - stageKey: your-phase
+    displayName: Your likely phase
+    stageType: Confirmation
+    queueKey: visitor
+    components:
+      - type: panel
+        heading: You are probably in discovery
+        showWhen: isDiscovery
+      - type: body
+        showWhen: isDiscovery
+        content: Discovery is about understanding the problem before you commit to building anything. Teams research with users, map the journey people go through today and agree which problem is worth solving.
+      - type: body
+        showWhen: isDiscovery
+        content: Before moving to alpha, a team can usually say who its users are, what they need and what problem it will work on, with evidence for each.
+      - type: body
+        showWhen: isDiscovery
+        content: 'Points to focus on: <a class="govuk-link" href="/the-service-standard/understand-users-and-their-needs/">1. Understand users and their needs</a>, <a class="govuk-link" href="/the-service-standard/solve-a-whole-problem-for-users/">2. Solve a whole problem for users</a> and <a class="govuk-link" href="/the-service-standard/have-a-multidisciplinary-team/">6. Have a multidisciplinary team</a>.'
+      - type: body
+        showWhen: isDiscovery
+        content: <a class="govuk-link" href="/methods/?phase=discovery">Methods that suit discovery</a>
+      - type: panel
+        heading: You are probably in alpha
+        showWhen: isAlpha
+      - type: body
+        showWhen: isAlpha
+        content: Alpha is about trying out different ways to solve the problem and throwing away the ones that do not work. Teams prototype, test their riskiest ideas with users and work out how they would build and run the service.
+      - type: body
+        showWhen: isAlpha
+        content: Before moving to beta, a team has usually tested its riskiest ideas with users, chosen an approach and knows how it will build, secure and run the service.
+      - type: body
+        showWhen: isAlpha
+        content: 'Points to focus on: <a class="govuk-link" href="/the-service-standard/make-the-service-simple-to-use/">4. Make the service simple to use</a>, <a class="govuk-link" href="/the-service-standard/make-sure-everyone-can-use-the-service/">5. Make sure everyone can use the service</a> and <a class="govuk-link" href="/the-service-standard/iterate-and-improve-frequently/">8. Iterate and improve frequently</a>.'
+      - type: body
+        showWhen: isAlpha
+        content: <a class="govuk-link" href="/methods/?phase=alpha">Methods that suit alpha</a>
+      - type: panel
+        heading: You are probably in beta
+        showWhen: isBeta
+      - type: body
+        showWhen: isBeta
+        content: Beta is about building a real service and letting people use it, first a limited group in private beta and then anyone in public beta. Teams keep testing, improving and measuring as real use grows.
+      - type: body
+        showWhen: isBeta
+        content: Before going live, a team can usually show that the service works for everyone who needs it, is secure and reliable, and that it is measuring how well the service meets user needs.
+      - type: body
+        showWhen: isBeta
+        content: 'Points to focus on: <a class="govuk-link" href="/the-service-standard/create-a-secure-service-which-protects-users-privacy/">9. Create a secure service which protects users'' privacy</a>, <a class="govuk-link" href="/the-service-standard/define-what-success-looks-like-and-publish-performance-data/">10. Define what success looks like and publish performance data</a> and <a class="govuk-link" href="/the-service-standard/operate-a-reliable-service/">14. Operate a reliable service</a>.'
+      - type: body
+        showWhen: isBeta
+        content: <a class="govuk-link" href="/methods/?phase=beta">Methods that suit beta</a>
+      - type: panel
+        heading: You are probably live
+        showWhen: isLive
+      - type: body
+        showWhen: isLive
+        content: Live means the service is how people get this done, and a team keeps improving it. The work carries on, led by research and data.
+      - type: body
+        showWhen: isLive
+        content: Keep researching with users, watch how the service performs and keep improving it. Plan when to retire anything the service has replaced.
+      - type: body
+        showWhen: isLive
+        content: 'Points to focus on: <a class="govuk-link" href="/the-service-standard/iterate-and-improve-frequently/">8. Iterate and improve frequently</a>, <a class="govuk-link" href="/the-service-standard/define-what-success-looks-like-and-publish-performance-data/">10. Define what success looks like and publish performance data</a> and <a class="govuk-link" href="/the-service-standard/operate-a-reliable-service/">14. Operate a reliable service</a>.'
+      - type: body
+        showWhen: isLive
+        content: <a class="govuk-link" href="/methods/?phase=live">Methods that suit live</a>
+      - type: inset-text
+        content: This is a suggestion based on your answers, not an assessment. Real projects rarely fit one phase neatly, and only an assessment panel decides whether a service meets the Service Standard.
+gateways:
+  - key: to-your-phase
+    displayName: Work out the likely phase
+    gatewayType: Split
+    queueKey: visitor
+    routes:
+      - id: to-your-phase--continue--your-phase
+        target: your-phase
+        trigger: continue
