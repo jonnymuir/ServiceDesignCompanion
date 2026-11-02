@@ -1,0 +1,184 @@
+name: TestFlight
+
+# Builds the iOS app with Prism's mobile bundle tool and uploads it to TestFlight. Manual dispatch
+# only: each run uses an App Store Connect build number and Apple processing time.
+#
+# Needs the App Store Connect API key (an Admin team key) as three secrets:
+# APP_STORE_CONNECT_API_KEY_P8, APP_STORE_CONNECT_KEY_ID and APP_STORE_CONNECT_ISSUER_ID, and the
+# Apple Team ID as the repo variable APPLE_TEAM_ID. The bundle ID must be registered and the app
+# record created in App Store Connect first.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      APP_HOSTNAME: servicedesign.prismreference.com
+      APP_NAME: Pocket SD
+      APP_ID: com.jonnymuir.pocketservicedesign
+      APP_VERSION: 1.0.0
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+      # Prism's script that revokes the development certificate an archive creates on a fresh
+      # runner, fetched at a fixed commit and checked against its hash rather than copied here.
+      REVOKE_SCRIPT_URL: https://raw.githubusercontent.com/jonnymuir/Umbraco.Prism/91ec455fcc35a4a073a11fb67fab3e262c30df1a/scripts/revoke-ci-development-certificates.mjs
+      REVOKE_SCRIPT_SHA256: 54a3c937bd873b73fa35f78d98c9de91eda2a1c335dab069ab4e0a161bd519c3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.17.1
+
+      - name: Check configuration
+        run: |
+          if [ -z "$APPLE_TEAM_ID" ]; then
+            echo "::error::Repo variable APPLE_TEAM_ID is not set."
+            exit 1
+          fi
+
+      - name: Generate the mobile bundle
+        run: |
+          dotnet tool restore
+          dotnet prism-mobile-bundle \
+            --hostname "$APP_HOSTNAME" \
+            --app-name "$APP_NAME" \
+            --app-id "$APP_ID" \
+            --version "$APP_VERSION" \
+            --saved-pages true \
+            --output mobile-bundle.zip
+          unzip -q mobile-bundle.zip -d mobile-app
+
+      - name: Add the app icon and splash screen
+        run: |
+          rm -f mobile-app/resources/icon.svg
+          cp src/ServiceDesignCompanion.Site/wwwroot/app/icon.png mobile-app/resources/icon.png
+          cp src/ServiceDesignCompanion.Site/wwwroot/app/splash.png mobile-app/resources/splash.png
+
+      - name: Bootstrap the iOS project
+        working-directory: mobile-app
+        run: |
+          npm install
+          npm run bootstrap:ios
+
+      # A native shell can build cleanly and still show a blank screen, so launch it in the
+      # simulator and check the content area (status and tab bars cropped away) has real content,
+      # twice in a row, before spending a TestFlight upload.
+      - name: Simulator smoke test
+        run: |
+          set -euo pipefail
+          xcodebuild -workspace mobile-app/ios/App/App.xcworkspace -scheme App -configuration Debug \
+            -sdk iphonesimulator -derivedDataPath build/sim-dd build
+          APP_PATH=$(find build/sim-dd -maxdepth 6 -iname "App.app" -path "*iphonesimulator*" | head -n 1)
+          SIM_UDID=$(xcrun simctl list devices available -j | jq -r '[.devices[][] | select(.isAvailable and (.name | startswith("iPhone")))][0].udid')
+          xcrun simctl boot "$SIM_UDID"
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          xcrun simctl install "$SIM_UDID" "$APP_PATH"
+          xcrun simctl launch "$SIM_UDID" "$APP_ID"
+          command -v magick >/dev/null 2>&1 || brew install imagemagick
+          PASSES=0
+          for attempt in $(seq 1 15); do
+            xcrun simctl io "$SIM_UDID" screenshot build/smoke.png
+            magick build/smoke.png -gravity Center -crop 100%x74%+0+0 +repage build/smoke-content.png
+            SPREAD=$(magick identify -format "%[fx:standard_deviation]" build/smoke-content.png)
+            echo "Attempt $attempt: content spread $SPREAD"
+            if (( $(echo "$SPREAD >= 0.03" | bc -l) )); then PASSES=$((PASSES + 1)); else PASSES=0; fi
+            [ "$PASSES" -ge 2 ] && break
+            sleep 4
+          done
+          xcrun simctl shutdown "$SIM_UDID" || true
+          if [ "$PASSES" -lt 2 ]; then
+            echo "::error::The app still showed a near-blank screen after a minute. See the smoke test screenshot."
+            exit 1
+          fi
+
+      - name: Upload the smoke test screenshot
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: simulator-smoke-test
+          path: build/smoke*.png
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Write the App Store Connect API key
+        env:
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+        run: |
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          printf '%s' "$APP_STORE_CONNECT_API_KEY_P8" > "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
+
+      # Signing is automatic: xcodebuild creates the certificate and profile with the API key's
+      # authority. The run number is the build number, which App Store Connect needs to be unique.
+      - name: Archive and export
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          AUTH=(-allowProvisioningUpdates
+            -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
+            -authenticationKeyID "$APP_STORE_CONNECT_KEY_ID"
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID")
+          xcodebuild -workspace mobile-app/ios/App/App.xcworkspace -scheme App -configuration Release \
+            -archivePath build/App.xcarchive archive "${AUTH[@]}" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" MARKETING_VERSION="$APP_VERSION" CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+          cat > ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key><string>app-store-connect</string>
+              <key>signingStyle</key><string>automatic</string>
+              <key>destination</key><string>export</string>
+              <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/ipa \
+            -exportOptionsPlist ExportOptions.plist "${AUTH[@]}"
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          IPA_PATH=$(find build/ipa -maxdepth 1 -name '*.ipa' | head -n 1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "::error::No .ipa was exported."
+            exit 1
+          fi
+          xcrun altool --upload-app -f "$IPA_PATH" -t ios \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+
+      - name: Revoke this run's development certificate
+        if: always()
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          if [ ! -d "$HOME/.appstoreconnect" ]; then exit 0; fi
+          curl -fsSL "$REVOKE_SCRIPT_URL" -o "$RUNNER_TEMP/revoke.mjs"
+          echo "$REVOKE_SCRIPT_SHA256  $RUNNER_TEMP/revoke.mjs" | shasum -a 256 -c -
+          node "$RUNNER_TEMP/revoke.mjs"
+
+      - name: Remove the API key from disk
+        if: always()
+        run: rm -rf "$HOME/.appstoreconnect"
