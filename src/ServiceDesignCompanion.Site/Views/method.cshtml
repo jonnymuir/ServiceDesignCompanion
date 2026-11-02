@@ -1,0 +1,37 @@
+﻿@inherits UmbracoViewPage
+@{
+    Layout = "Shared/Master.cshtml";
+    var standard = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.ServiceStandardPage);
+    var points = Model.RelatedPoints();
+    var pointPages = standard?.Children().Where(page => points.Contains(page.Value<int>(SiteContentTypes.PointNumber))).ToList() ?? [];
+}
+<span class="govuk-caption-l">@Model.Value(SiteContentTypes.Category)</span>
+<h1 class="govuk-heading-xl">@Model.Name</h1>
+<p class="govuk-body-l">@Model.Value(SiteContentTypes.Summary)</p>
+
+<h2 class="govuk-heading-m">When to use it</h2>
+<p class="govuk-body psd-prose">@Model.Value(SiteContentTypes.WhenToUse)</p>
+<partial name="Partials/PhaseTags" model="Model.Phases()" />
+
+<h2 class="govuk-heading-m">How to do it</h2>
+<ol class="govuk-list govuk-list--number psd-prose">
+    @foreach (var step in Model.Steps())
+    {
+        <li>@step</li>
+    }
+</ol>
+
+@if (pointPages.Count > 0)
+{
+    <div class="psd-questions">
+        <h2 class="govuk-heading-m">Helps with</h2>
+        <ul class="govuk-list">
+            @foreach (var pointPage in pointPages)
+            {
+                <li><a class="govuk-link" href="@pointPage.Url()">Point @(pointPage.Value<int>(SiteContentTypes.PointNumber)): @pointPage.Name</a></li>
+            }
+        </ul>
+    </div>
+}
+
+<p class="govuk-body"><a class="govuk-link" href="@(Model.Parent<IPublishedContent>()?.Url())">All methods</a></p>

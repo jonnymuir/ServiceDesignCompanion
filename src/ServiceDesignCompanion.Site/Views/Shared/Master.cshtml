@@ -2,6 +2,7 @@
 @{
     var isApp = PrismMobileRequestDetection.IsPrismMobileRequest(Context);
     var standard = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.ServiceStandardPage);
+    var methods = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.MethodsPage);
     var title = Model.ContentType.Alias == SiteContentTypes.Home ? "Pocket Service Design" : $"{Model.Name} - Pocket Service Design";
 }
 <!DOCTYPE html>
@@ -29,12 +30,16 @@
     <header class="psd-header">
         <div class="govuk-width-container psd-header__inner">
             <a class="psd-header__name" href="/">Pocket Service Design</a>
-            @if (standard is not null)
-            {
-                <nav aria-label="Main">
+            <nav class="psd-header__nav" aria-label="Main">
+                @if (standard is not null)
+                {
                     <a class="psd-header__link" href="@standard.Url()">The Service Standard</a>
-                </nav>
-            }
+                }
+                @if (methods is not null)
+                {
+                    <a class="psd-header__link" href="@methods.Url()">Methods</a>
+                }
+            </nav>
         </div>
     </header>
 

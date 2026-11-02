@@ -47,8 +47,8 @@ public sealed class BootedSite : WebApplicationFactory<Program>, IAsyncLifetime
         var deadline = DateTime.UtcNow.AddMinutes(4);
         while (DateTime.UtcNow < deadline)
         {
-            // The seeder publishes the points in order, so the last one means the whole site is there.
-            var response = await browser.GetAsync("/the-service-standard/operate-a-reliable-service/");
+            // The seeder publishes the method cards last, in order, so the last one means the whole site is there.
+            var response = await browser.GetAsync("/methods/team-charter/");
             if (response.IsSuccessStatusCode) return;
             await Task.Delay(1000);
         }

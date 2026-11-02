@@ -48,6 +48,30 @@ public sealed partial class SiteContentSeeder(
                 [SiteContentTypes.GuidanceUrl] = point.GuidanceUrl,
             });
         }
+
+        ReconcileMethods(home);
+    }
+
+    private void ReconcileMethods(IContent home)
+    {
+        var methods = Reconcile(home, SiteContentTypes.MethodsPage, "Methods", 1, new Dictionary<string, object?>
+        {
+            [SiteContentTypes.Intro] = "Service design methods that help a team meet the Standard, with when to use each one and how to start.",
+        });
+
+        for (var i = 0; i < MethodCards.All.Count; i++)
+        {
+            var card = MethodCards.All[i];
+            Reconcile(methods, SiteContentTypes.MethodPage, card.Title, i, new Dictionary<string, object?>
+            {
+                [SiteContentTypes.Category] = card.Category,
+                [SiteContentTypes.Summary] = card.Summary,
+                [SiteContentTypes.WhenToUse] = card.WhenToUse,
+                [SiteContentTypes.Steps] = string.Join('\n', card.Steps),
+                [SiteContentTypes.Phases] = string.Join(", ", card.Phases),
+                [SiteContentTypes.RelatedPoints] = string.Join(", ", card.Points),
+            });
+        }
     }
 
     private IContent Reconcile(IContent? parent, string contentTypeAlias, string name, int sortOrder, Dictionary<string, object?> values)

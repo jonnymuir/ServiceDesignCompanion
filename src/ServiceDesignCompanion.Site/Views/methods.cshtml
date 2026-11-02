@@ -1,0 +1,60 @@
+﻿@inherits UmbracoViewPage
+@{
+    Layout = "Shared/Master.cshtml";
+    var phase = Enum.TryParse<Phase>(Context.Request.Query["phase"], ignoreCase: true, out var chosenPhase) ? chosenPhase : (Phase?)null;
+    var point = int.TryParse(Context.Request.Query["point"], out var chosenPoint) && ServiceStandard.Points.Any(p => p.Number == chosenPoint) ? chosenPoint : (int?)null;
+    var all = Model.Children().ToList();
+    var shown = all
+        .Where(method => phase is null || method.Phases().Contains(phase.Value))
+        .Where(method => point is null || method.RelatedPoints().Contains(point.Value))
+        .ToList();
+}
+<h1 class="govuk-heading-xl">@Model.Name</h1>
+<p class="govuk-body-l">@Model.Value(SiteContentTypes.Intro)</p>
+
+<form method="get" action="@Model.Url()" class="psd-filter">
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="phase">Phase</label>
+        <select class="govuk-select" id="phase" name="phase">
+            <option value="">Any phase</option>
+            @foreach (var option in MethodCards.AllPhases)
+            {
+                <option value="@option" selected="@(option == phase)">@option</option>
+            }
+        </select>
+    </div>
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="point">Service Standard point</label>
+        <select class="govuk-select" id="point" name="point">
+            <option value="">Any point</option>
+            @foreach (var option in ServiceStandard.Points)
+            {
+                <option value="@option.Number" selected="@(option.Number == point)">@option.Number. @option.Title</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="govuk-button" data-module="govuk-button">Show methods</button>
+</form>
+
+<p class="govuk-body" role="status">
+    Showing @shown.Count of @all.Count methods.
+    @if (phase is not null || point is not null)
+    {
+        <a class="govuk-link" href="@Model.Url()">Show all methods</a>
+    }
+</p>
+
+@foreach (var group in shown.GroupBy(method => method.Value<string>(SiteContentTypes.Category)))
+{
+    <h2 class="govuk-heading-m">@group.Key</h2>
+    <ul class="psd-methods">
+        @foreach (var method in group)
+        {
+            <li class="psd-methods__item">
+                <a class="govuk-link psd-methods__title" href="@method.Url()">@method.Name</a>
+                <p class="govuk-body-s psd-methods__summary">@method.Value(SiteContentTypes.Summary)</p>
+                <partial name="Partials/PhaseTags" model="method.Phases()" />
+            </li>
+        }
+    </ul>
+}

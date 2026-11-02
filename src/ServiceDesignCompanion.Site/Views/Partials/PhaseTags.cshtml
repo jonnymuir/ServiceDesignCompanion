@@ -1,0 +1,7 @@
+@model IReadOnlyList<Phase>
+<ul class="psd-phases" aria-label="Phases">
+    @foreach (var phase in Model)
+    {
+        <li><strong class="psd-phase psd-phase--@phase.ToString().ToLowerInvariant()">@phase</strong></li>
+    }
+</ul>
