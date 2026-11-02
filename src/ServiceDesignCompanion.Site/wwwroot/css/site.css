@@ -28,6 +28,8 @@
   --prism-surface-alt: #f4f8f7;
   --prism-border: #b9cbc8;
   --prism-focus: #ffc94a;
+  /* Prism's page background, which its stylesheet applies inside the app. */
+  --bg-offset: #f4f8f7;
 
   --govuk-template-background-colour: #f4f8f7;
   --govuk-surface-background-colour: #f4f8f7;
@@ -53,6 +55,7 @@
     --prism-surface: #0f1716;
     --prism-surface-alt: #172221;
     --prism-border: #3a5250;
+    --bg-offset: #0f1716;
 
     --govuk-template-background-colour: #0f1716;
     --govuk-surface-background-colour: #172221;

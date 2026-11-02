@@ -1,6 +1,7 @@
 @inherits UmbracoViewPage
 @{
     var isApp = PrismMobileRequestDetection.IsPrismMobileRequest(Context);
+    var hasNativeTabs = PrismMobileRequestDetection.HasNativeTabs(Context);
     var standard = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.ServiceStandardPage);
     var methods = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.MethodsPage);
     var phaseFinder = Model.Root().FirstChild(c => c.ContentType.Alias == SiteContentTypes.PhaseFinderPage);
@@ -31,20 +32,24 @@
     <header class="psd-header">
         <div class="govuk-width-container psd-header__inner">
             <a class="psd-header__name" href="/">Pocket Service Design</a>
-            <nav class="psd-header__nav" aria-label="Main">
-                @if (standard is not null)
-                {
-                    <a class="psd-header__link" href="@standard.Url()">The Service Standard</a>
-                }
-                @if (methods is not null)
-                {
-                    <a class="psd-header__link" href="@methods.Url()">Methods</a>
-                }
-                @if (phaseFinder is not null)
-                {
-                    <a class="psd-header__link" href="@phaseFinder.Url()">Phase finder</a>
-                }
-            </nav>
+            @* In the app the native tab bar is the navigation. *@
+            @if (!hasNativeTabs)
+            {
+                <nav class="psd-header__nav" aria-label="Main">
+                    @if (standard is not null)
+                    {
+                        <a class="psd-header__link" href="@standard.Url()">The Service Standard</a>
+                    }
+                    @if (methods is not null)
+                    {
+                        <a class="psd-header__link" href="@methods.Url()">Methods</a>
+                    }
+                    @if (phaseFinder is not null)
+                    {
+                        <a class="psd-header__link" href="@phaseFinder.Url()">Phase finder</a>
+                    }
+                </nav>
+            }
         </div>
     </header>
 
@@ -65,7 +70,7 @@
     {
         <script src="/App_Plugins/UmbracoPrism/mobile-shell/prism-mobile-shell-guard.js" asp-append-version="true"></script>
     }
-    @if (PrismMobileRequestDetection.HasNativeTabs(Context))
+    @if (hasNativeTabs)
     {
         @* Saved pages: the app keeps copies of pages on the device so they can be read offline. *@
         <script src="/App_Plugins/UmbracoPrism/mobile-shell/prism-offline.js" asp-append-version="true"
