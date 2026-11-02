@@ -19,14 +19,7 @@
     <p class="govuk-body-l">@summary</p>
 }
 
-@if (!string.IsNullOrWhiteSpace(explainer))
-{
-    <div class="govuk-body psd-prose">@Html.Raw(explainer)</div>
-}
-else
-{
-    <p class="govuk-body">Our plain-words guide to this point is on its way. Until then, the full guidance is on GOV.UK.</p>
-}
+<div class="govuk-body psd-prose">@Html.Raw(explainer)</div>
 
 @if (questions.Length > 0)
 {

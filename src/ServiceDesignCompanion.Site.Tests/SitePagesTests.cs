@@ -24,27 +24,29 @@ public sealed class SitePagesTests(BootedSite site)
     }
 
     [Fact]
-    public async Task AWrittenPoint_ShowsItsSummaryQuestionsAndGuidanceLink()
+    public async Task EveryPoint_ShowsItsSummaryQuestionsAndGuidanceLink()
     {
-        var point = ServiceStandard.Points[0];
+        var html = await site.PageTextAsync("/the-service-standard/");
+        foreach (var point in ServiceStandard.Points)
+        {
+            var path = PointPath(html, point.Title);
+            var page = await site.PageTextAsync(path);
 
-        var html = await site.PageTextAsync("/the-service-standard/understand-users-and-their-needs/");
-
-        html.Should().Contain("Point 1 of 14");
-        html.Should().Contain(point.Summary);
-        html.Should().Contain("Questions to think about");
-        html.Should().Contain(point.Questions![0]);
-        html.Should().Contain($"href=\"{point.GuidanceUrl}\"");
+            page.Should().Contain($"Point {point.Number} of 14", because: point.Title);
+            page.Should().Contain(point.Summary, because: point.Title);
+            page.Should().Contain("Questions to think about", because: point.Title);
+            page.Should().Contain(point.Questions![0], because: point.Title);
+            page.Should().Contain($"href=\"{point.GuidanceUrl}\"", because: point.Title);
+        }
     }
 
-    [Fact]
-    public async Task APointNotYetWritten_SaysSoAndLinksToTheGuidance()
+    // Follows the link on The Service Standard page rather than guessing the URL.
+    private static string PointPath(string standardPage, string title)
     {
-        var html = await site.PageTextAsync("/the-service-standard/operate-a-reliable-service/");
-
-        html.Should().Contain("Our plain-words guide to this point is on its way");
-        html.Should().Contain($"href=\"{ServiceStandard.Points[13].GuidanceUrl}\"");
-        html.Should().NotContain("Questions to think about");
+        var titleAt = standardPage.IndexOf($">{title}</a>", StringComparison.Ordinal);
+        titleAt.Should().BePositive(because: title);
+        var hrefAt = standardPage.LastIndexOf("href=\"", titleAt, StringComparison.Ordinal) + "href=\"".Length;
+        return standardPage[hrefAt..standardPage.IndexOf('"', hrefAt)];
     }
 
     [Fact]
