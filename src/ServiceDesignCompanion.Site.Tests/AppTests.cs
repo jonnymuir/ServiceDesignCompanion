@@ -43,4 +43,17 @@ public sealed class AppTests(BootedSite site)
         inApp.Should().Contain("Pocket Service Design").And.NotContain("aria-label=\"Main\"");
         onTheWeb.Should().Contain("aria-label=\"Main\"");
     }
+
+    [Fact]
+    public async Task ThePhaseFinder_IsNeverStored_SoTheAppNeverShowsAnEarlierRun()
+    {
+        using var app = site.Browser();
+        app.DefaultRequestHeaders.UserAgent.ParseAdd(AppUserAgent);
+
+        var phaseFinder = await app.GetAsync("/phase-finder/");
+        var methods = await app.GetAsync("/methods/");
+
+        phaseFinder.Headers.CacheControl!.NoStore.Should().BeTrue();
+        (methods.Headers.CacheControl?.NoStore ?? false).Should().BeFalse();
+    }
 }

@@ -2,6 +2,9 @@
 @using ServiceDesignCompanion.Site.PhaseFinder
 @{
     Layout = "Shared/Master.cshtml";
+    // The page shows this visitor's own answers, so it must never be stored: the app's saved
+    // pages would otherwise open the tab on the result from the previous run.
+    Context.Response.Headers.CacheControl = "no-store";
 }
 <span class="govuk-caption-l">@Model.Name</span>
 @await Html.PartialAsync("~/Views/Partials/_WayfinderStageForBlueprint.cshtml", PhaseFinderComposer.BlueprintKey)
