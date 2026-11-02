@@ -86,6 +86,8 @@ body,
 .govuk-caption-l { color: var(--prism-muted); }
 
 .psd-header { background: var(--psd-header); color: var(--psd-header-text); border-bottom: 4px solid var(--prism-primary); }
+/* In the app the page runs under the status bar and camera, so the header starts below them. */
+.psd-header { padding-top: env(safe-area-inset-top, 0px); }
 .psd-header__inner { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; justify-content: space-between; padding-block: 14px; }
 .psd-header__name, .psd-header__link { color: var(--psd-header-text); text-decoration: none; font-weight: 700; }
 .psd-header__name { font-size: 1.25rem; }
