@@ -489,3 +489,6 @@ $RECYCLE.BIN/
 **/wwwroot/media/
 **/wwwroot/umbraco/
 **/uSync/
+
+# Schema files Umbraco's build targets drop into the test project
+src/ServiceDesignCompanion.Site.Tests/appsettings-schema*.json
