@@ -49,6 +49,10 @@ public sealed partial class SiteContentSeeder(
             });
         }
 
+        Reconcile(home, SiteContentTypes.PhaseFinderPage, "Phase finder", 2, new Dictionary<string, object?>
+        {
+            [SiteContentTypes.Intro] = "Five questions about your project, and the phase it is probably in.",
+        });
         ReconcileMethods(home);
     }
 

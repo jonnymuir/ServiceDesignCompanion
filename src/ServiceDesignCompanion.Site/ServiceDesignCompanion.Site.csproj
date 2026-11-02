@@ -20,6 +20,11 @@
   </ItemGroup>
 
 
+  <ItemGroup>
+    <!-- Blueprints are seeded from these files on every boot. -->
+    <None Include="service-blueprints\**\*.yaml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>

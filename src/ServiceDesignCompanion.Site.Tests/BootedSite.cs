@@ -23,7 +23,14 @@ public sealed class BootedSite : WebApplicationFactory<Program>, IAsyncLifetime
     });
 
     /// <summary>A page's HTML with entities decoded, so assertions read as the visitor sees the text.</summary>
-    public async Task<string> PageTextAsync(string path) => System.Net.WebUtility.HtmlDecode(await Browser().GetStringAsync(path));
+    public async Task<string> PageTextAsync(string path)
+    {
+        using var browser = Browser();
+        return await TextOf(browser, path);
+    }
+
+    /// <summary>The same, through a browser that keeps its cookies between requests.</summary>
+    public static async Task<string> TextOf(HttpClient browser, string path) => System.Net.WebUtility.HtmlDecode(await browser.GetStringAsync(path));
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
