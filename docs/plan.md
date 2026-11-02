@@ -8,8 +8,8 @@ A free mobile app (iOS and Android) and companion website with three parts:
    this app, questions to think about, and links to the live guidance on GOV.UK.
 2. **Phase finder.** A short anonymous Wayfinder journey. A team answers a few questions about
    their project and gets a suggestion of their likely phase (discovery, alpha, beta or live),
-   what is usually expected next, and which points to focus on. The answer is shown on screen
-   and never stored.
+   what is usually expected next, and which points to focus on. Answers are not linked to anyone,
+   nothing is audited, and an anonymous draft is deleted within two hours.
 3. **Method cards.** Around 20 to 30 service design methods, each with what it is for, when to use
    it, the phase it suits and the related Standard point. Filterable by phase and by point.
    Favourites are kept on the device only.

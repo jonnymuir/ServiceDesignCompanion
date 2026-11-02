@@ -112,7 +112,14 @@ body,
 
 /* GOV.UK Frontend hard-codes its green on buttons; follow the brand instead. */
 .govuk-button { background-color: var(--prism-primary); color: var(--prism-primary-contrast); box-shadow: 0 2px 0 var(--psd-button-shadow); font-family: var(--govuk-font-family); }
-.govuk-button:hover { background-color: var(--psd-button-hover); color: var(--prism-primary-contrast); }
+.govuk-button:link, .govuk-button:visited, .govuk-button:hover { color: var(--prism-primary-contrast); }
+.govuk-button:hover { background-color: var(--psd-button-hover); }
+.govuk-button--secondary, .govuk-button--secondary:link, .govuk-button--secondary:visited { background-color: var(--psd-tile); color: var(--prism-text); box-shadow: 0 2px 0 var(--prism-border); }
+.govuk-button--secondary:hover { background-color: var(--psd-line); color: var(--prism-text); }
+
+/* The phase finder's result: brand teal rather than GOV.UK's success green. */
+.govuk-panel--confirmation { background: var(--prism-primary); color: var(--prism-primary-contrast); font-family: var(--govuk-font-family); }
+.govuk-panel--confirmation .govuk-panel__title, .govuk-panel--confirmation .govuk-panel__body { color: inherit; font-family: inherit; }
 .govuk-button:focus:not(:active):not(:hover) { background-color: var(--prism-focus); color: #1b1a12; box-shadow: 0 2px 0 #1b1a12; }
 
 .psd-header__nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }

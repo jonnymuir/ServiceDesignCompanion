@@ -1,0 +1,7 @@
+﻿@inherits UmbracoViewPage
+@using ServiceDesignCompanion.Site.PhaseFinder
+@{
+    Layout = "Shared/Master.cshtml";
+}
+<span class="govuk-caption-l">@Model.Name</span>
+@await Html.PartialAsync("~/Views/Partials/_WayfinderStageForBlueprint.cshtml", PhaseFinderComposer.BlueprintKey)
